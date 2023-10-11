@@ -54,10 +54,15 @@ exports.notice = async function (comment) {
     text: comment.get('comment'),
     url: `${process.env.SITE_URL + comment.get('url')}#${comment.get('objectId')}`,
   })
-
+  var webmaster_email = process.env.TO_EMAIL ? process.env.TO_EMAIL : process.env.SMTP_USER;
+  if (process.env.PAGE_MASTER_EMAIL){
+    const page_master_email = eval("(" + process.env.PAGE_MASTER_EMAIL + ")");
+    const url = comment.get('url');
+    if (page_master_email[url]) webmaster_email=page_master_email[url];
+  }
   const mailOptions = {
     from: `"${process.env.SENDER_NAME}" <${process.env.SMTP_USER}>`,
-    to: process.env.TO_EMAIL ? process.env.TO_EMAIL : process.env.SMTP_USER,
+    to: webmaster_email,
     subject: emailSubject,
     html: emailContent,
   }
