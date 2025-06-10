@@ -10,7 +10,7 @@
 
 1. 更好的邮件通知
 2. 旧的唤醒策论需要LeanCloud实例的域名，但目前只能绑定备案后的域名，所以这里我直接在node程序中遍历未发送邮件的评论。
-3. ✨**你无需再绑定域名**！！！
+3. ✨你无需再绑定域名（仅针对邮件功能）
 4. ✨**你无需再创建定时任务**！！！
 5. ✨服务器启动1分钟后尝试第一次扫描评论，然后每隔2分钟扫描一次评论，如果昨天的评论，都是通知过的，则结束循环
 6. ✨引入eslint
@@ -44,16 +44,24 @@
 
 <img width="700" src="https://cdn.jun6.net/201806062257_798.png" />
 
-### 必选参数
+### 详情
 
-* `SITE_NAME` : 网站名称。
-* `SITE_URL` : 网站地址, **最后不要加 `/` 。**
-* `SMTP_USER` : SMTP 服务用户名，一般为邮箱地址。
-* `SMTP_PASS` : SMTP 密码，一般为授权码，而不是邮箱的登陆密码，请自行查询对应邮件服务商的获取方式
-* `SMTP_SERVICE` : 邮件服务提供商，支持 `QQ`、`163`、`126`、`Gmail`、`"Yahoo"`、`......`  ，全部支持请参考 : [Nodemailer Supported services](https://nodemailer.com/smtp/well-known/#supported-services)。 --- *如这里没有你使用的邮件提供商，请查看[自定义邮件服务器](/高级配置.md#自定义邮件服务器)*
-* `SENDER_NAME` : 寄件人名称。
+变量 | 示例 | 说明
+--- | ------ | ---------
+SITE_NAME | Deserts | [必填]博客名称
+SITE_URL  | https://panjunwen.com | [必填]首页地址
+**SMTP_SERVICE** | QQ | [新版支持]邮件服务提供商，支持 QQ、163、126、Gmail 以及 [更多](https://nodemailer.com/smtp/well-known/#supported-services)
+SMTP_USER | xxxxxx@qq.com | [必填]SMTP登录用户
+SMTP_PASS | ccxxxxxxxxch | [必填]SMTP登录密码（QQ邮箱需要获取独立密码）
+SENDER_NAME | Deserts | [必填]发件人
+SENDER_EMAIL | xxxxxx@qq.com | [必填]发件邮箱
+ADMIN_URL | https://xxx.leanapp.cn/ | [建议]Web主机二级域名（云引擎域名），用于自动唤醒
+BLOGGER_EMAIL | xxxxx@gmail.com | [可选]博主通知收件地址，默认使用SENDER_EMAIL
+AKISMET_KEY | xxxxxxxx | [可选]Akismet Key 用于垃圾评论检测，设为MANUAL_REVIEW开启人工审核，留空不使用反垃圾
 
 ## 高级配置
+
+[垃圾评论检测](/高级配置.md#垃圾评论检测)
 
 [自定义邮件模板](/高级配置.md#自定义邮件模板)
 

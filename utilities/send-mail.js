@@ -28,6 +28,7 @@ const noticeTemplate = ejs.compile(fs.readFileSync(path.resolve(process.cwd(), '
 const sendTemplate = ejs.compile(fs.readFileSync(path.resolve(process.cwd(), 'template', templateName, 'send.ejs'), 'utf8'))
 
 function sendMail(mailOptions) {
+  console.log('发送邮件给: ', mailOptions?.to)
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -44,7 +45,7 @@ exports.notice = async function (comment) {
   // 站长自己发的评论不需要通知
   if (comment.get('mail') === process.env.TO_EMAIL
         || comment.get('mail') === process.env.SMTP_USER)
-    return 'notice skipped'
+    return 'notice skipped: 站长自己发的评论'
 
   const emailSubject = `👉 咚！「${process.env.SITE_NAME}」上有新评论了`
   const emailContent = noticeTemplate({
@@ -75,19 +76,17 @@ exports.send = async function (comment) {
   // @ 评论通知
   const pid = comment.get('pid')
   if (!pid)
-    return ('send skipped')
+    return 'send skipped: 不是回复'
   // 通过被 @ 的评论 id, 则找到这条评论留下的邮箱并发送通知.
   const query = new AV.Query('Comment')
   const parentComment = await query.get(pid)
-  if (!parentComment) {
-    console.error('oops, 找不到回复的评论了')
-    return 'send skipped'
-  }
+  if (!parentComment)
+    return 'send skipped: oops, 找不到回复的评论了'
   if (parentComment.get('mail')) {
     // 站长被 @ 不需要提醒
     if (parentComment.get('mail') === process.env.TO_EMAIL
             || parentComment.get('mail') === process.env.SMTP_USER)
-      return 'send skipped'
+      return 'send skipped: 站长被 @不需要提醒'
 
     const emailSubject = `👉 叮咚！「${process.env.SITE_NAME}」上有人@了你`
     const emailContent = sendTemplate({
@@ -109,7 +108,7 @@ exports.send = async function (comment) {
     return await sendMail(mailOptions)
   }
   else {
-    console.log(`${comment.get('nick')} @ 了${parentComment.get('nick')}, 但被 @ 的人没留邮箱... 无法通知`)
+    return `send skipped: ${comment.get('nick')} @ 了${parentComment.get('nick')}, 但被 @ 的人没留邮箱... 无法通知`
   }
 }
 
